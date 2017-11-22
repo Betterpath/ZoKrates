@@ -1,39 +1,76 @@
 #!/bin/bash
 
 set -e
-set -x
 
-CONTAINER=betterpath/zokrates
-ZOKRATES=/root/ZoKrates/target/release/zokrates
+NAME="zokrates"
+CONTAINER="betterpath/zokrates"
+ZOKRATES="/root/ZoKrates/target/release/zokrates"
+OPTS="compile | compute-witness | setup | generate-proof | export-verifier | output | all"
 
 function usage() {
-    echo "Usage: ./deployment/bin/compose [up | zokrates [compile | compute-witness | setup | generate-proof | export-verifier]]"
+    echo "Usage: ./deployment/bin/compose [up | zokrates [$OPTS]]"
 }
 
+function zokrates-compile () {
+    docker exec -it $NAME $ZOKRATES compile -i '/root/ZoKrates/examples/add.code'
+}
+
+function zokrates-compute-witness () {
+    docker exec -it $NAME $ZOKRATES compute-witness -a 1 2 3
+}
+
+function zokrates-setup () {
+    docker exec -it $NAME $ZOKRATES setup
+}
+
+function zokrates-generate-proof () {
+    docker exec -it $NAME $ZOKRATES generate-proof
+}
+
+function zokrates-export-verifier () {
+    docker exec -it $NAME $ZOKRATES export-verifier
+}
+
+function zokrates-output() {
+    docker exec -it $NAME $ZOKRATES mv out out.code proving.key variables.inf verification.key \
+           verifier.sol witness /root/ZoKrates/output
+}
 case "$1" in
     "up")
-        docker rm -f $CONTAINER | true
+        docker rm -f $NAME | true
         docker build . -t $CONTAINER
-        docker run -it $CONTAINER --name zokrates
+        docker run --name $NAME -v $(pwd)/examples:/root/ZoKrates/examples \
+               -v $(pwd)/output:/root/ZoKrates/output -itd $CONTAINER
         ;;
     "zokrates")
         shift;
         case "$1" in
             "compile")
-                docker exec -it $CONTAINER $ZOKRATES compile -i 'examples/add.code'
+                zokrates-compile
                 ;;
             "compute-witness")
-                docker exec -it $CONTAINER $ZOKRATES compute-witness -a 1 2 3
+                zokrates-compute-witness
                 ;;
             "setup")
-                docker exec -it $CONTAINER $ZOKRATES setup
+                zokrates-setup
                 ;;
             "generate-proof")
-                docker exec -it $CONTAINER $ZOKRATES generate-proof
+                zokrates-generate-proof
                 ;;
             "export-verifier")
-                docker exec -it $CONTAINER $ZOKRATES export-verifier
+                zokrates-export-verifier
                 ;;
+            "output")
+                zokrates-output
+                ;;
+            "all")
+                zokrates-compile
+                zokrates-compute-witness
+                zokrates-setup
+                zokrates-generate-proof
+                zokrates-export-verifier
+                zokrates-output
+                ;; 
             *)
                 usage
                 ;;

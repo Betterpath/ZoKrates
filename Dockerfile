@@ -33,4 +33,6 @@ COPY . /root/ZoKrates
 RUN cd ZoKrates \
   && cargo build --release
 
+WORKDIR /root/ZoKrates
+
 CMD tail -f /dev/null
