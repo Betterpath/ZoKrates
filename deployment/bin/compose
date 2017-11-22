@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -e
+set -x
+
+CONTAINER=betterpath/zokrates
+ZOKRATES=/root/ZoKrates/target/release/zokrates
+
+function usage() {
+    echo "Usage: ./deployment/bin/compose [up | zokrates [compile | compute-witness | setup | generate-proof | export-verifier]]"
+}
+
+case "$1" in
+    "up")
+        docker rm -f $CONTAINER | true
+        docker build . -t $CONTAINER
+        docker run -it $CONTAINER --name zokrates
+        ;;
+    "zokrates")
+        shift;
+        case "$1" in
+            "compile")
+                docker exec -it $CONTAINER $ZOKRATES compile -i 'examples/add.code'
+                ;;
+            "compute-witness")
+                docker exec -it $CONTAINER $ZOKRATES compute-witness -a 1 2 3
+                ;;
+            "setup")
+                docker exec -it $CONTAINER $ZOKRATES setup
+                ;;
+            "generate-proof")
+                docker exec -it $CONTAINER $ZOKRATES generate-proof
+                ;;
+            "export-verifier")
+                docker exec -it $CONTAINER $ZOKRATES export-verifier
+                ;;
+            *)
+                usage
+                ;;
+        esac 
+        ;;
+    *)
+        usage
+        ;;
+esac

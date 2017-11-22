@@ -24,7 +24,7 @@ def add(a, b, c):
 ```
 with `add(1, 2, 3)`, call
 ```
-./zokrates compile -i 'add.code_path'
+./zokrates compile -i 'add.code'
 ./zokrates compute-witness -a 1 2 3
 ./zokrates setup
 ./zokrates generate-proof
