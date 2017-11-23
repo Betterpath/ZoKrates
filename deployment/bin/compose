@@ -32,12 +32,13 @@ function zokrates-export-verifier () {
 }
 
 function zokrates-output() {
-    docker exec -it $NAME $ZOKRATES mv out out.code proving.key variables.inf verification.key \
+    docker exec -it $NAME mv out out.code proving.key variables.inf verification.key \
            verifier.sol witness /root/ZoKrates/output
 }
+
 case "$1" in
     "up")
-        docker rm -f $NAME | true
+        # docker rm -f $NAME | true
         docker build . -t $CONTAINER
         docker run --name $NAME -v $(pwd)/examples:/root/ZoKrates/examples \
                -v $(pwd)/output:/root/ZoKrates/output -itd $CONTAINER

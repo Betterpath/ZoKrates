@@ -2,3 +2,5 @@ target
 deployment
 Dockerfile
 output
+README.md
+.git

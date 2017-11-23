@@ -39,10 +39,8 @@ Currently needs to be build with nightly Rust.
 
 Example usage:
 ```
-docker build -t zokrates .
-docker run -ti zokrates /bin/bash
-cd ZoKrates
-./target/release/zokrates compile -i examples/add.code
+./deployment/bin/compose up
+./deployment/bin/compose zokrates all
 ```
 
 ### Without libsnark
